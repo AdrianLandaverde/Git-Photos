@@ -1,5 +1,8 @@
 import streamlit as st
 import math
+from github import Github
+import datetime
+from stqdm import stqdm
 
 st.title("Git Photos")
 
@@ -25,3 +28,12 @@ for i in range(math.ceil(len(st.session_state.images)/3)):
         if i*3+2 < len(st.session_state.images):
             st.image(st.session_state.images[i*3+2], caption=st.session_state.images_names[i*3+2], use_column_width = True)
     
+
+if st.button('Upload Files'):
+    g= Github(st.secrets["github_token"])
+    path= st.secrets["github_user"] + "/" + st.secrets["github_repo"]
+    repo= g.get_repo(path)
+    for i in stqdm(range(len(st.session_state.images)), desc="Upload files"):
+        st.write("Uploading file "+str(i))
+        datetime= datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        repo.create_file(st.session_state.images_names[i], "Upload photo at "+datetime, st.session_state.images[i])
