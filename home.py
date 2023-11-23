@@ -33,7 +33,8 @@ if st.button('Upload Files'):
     g= Github(st.secrets["github_token"])
     path= st.secrets["github_user"] + "/" + st.secrets["github_repo"]
     repo= g.get_repo(path)
-    for i in stqdm(range(len(st.session_state.images)), desc="Upload files"):
+    for i in stqdm(range(len(st.session_state.images)), desc="Uploading files"):
         st.write("Uploading file "+str(i))
         datetime= datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         repo.create_file(st.session_state.images_names[i], "Upload photo at "+datetime, st.session_state.images[i])
+        
