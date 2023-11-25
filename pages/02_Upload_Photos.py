@@ -46,35 +46,37 @@ with col_upload:
                 st.image(st.session_state.images[i*3+2], caption=st.session_state.images_names[i*3+2], use_column_width = True)
             
 with col_metadata:
-    option = st.selectbox(
-    'Album',
-    json_metadata["Albums"])
+    with st.form("my_form"):
+        option = st.selectbox(
+        'Album',
+        json_metadata["Albums"])
 
-    date = st.date_input("Date of event", value=datetime.datetime.now())
-    st.write(date)
+        date = st.date_input("Date of event", value=datetime.datetime.now())
+        st.write(date)
 
-    message = st.text_input(
-        "Message 👇",
-        placeholder= "An amazing day ✨",
-    )
+        message = st.text_input(
+            "Message 👇",
+            placeholder= "An amazing day ✨",
+        )
 
-    if st.button('Upload Files'):
-        list_info= []
-        for i in stqdm(range(len(st.session_state.images)), desc="Uploading files"):
-            date_string= datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-            repo.create_file(date_string+".jpg", "Upload photo at "+date_string, st.session_state.images[i])
-            list_info.append([date, option, message, date_string+".jpg"])
+        submitted = st.form_submit_button("Upload Files")
+        if submitted:
+            list_info= []
+            for i in stqdm(range(len(st.session_state.images)), desc="Uploading files"):
+                date_string= datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+                repo.create_file(date_string+".jpg", "Upload photo at "+date_string, st.session_state.images[i])
+                list_info.append([date, option, message, date_string+".jpg"])
 
-        with st.spinner('Loading final files into Github...'):
-            df= pd.DataFrame(list_info, columns=["Date", "Album", "Message", "Photos"])
-            contents= repo.get_contents("History.csv")
-            df_original= pd.read_csv(contents.download_url)
-            df= pd.concat([df_original, df])
-            df_bytes = df.to_csv(index=False).encode()
-            repo.update_file("History.csv", "Updated history file", df_bytes, contents.sha)
+            with st.spinner('Loading final files into Github...'):
+                df= pd.DataFrame(list_info, columns=["Date", "Album", "Message", "Photos"])
+                contents= repo.get_contents("History.csv")
+                df_original= pd.read_csv(contents.download_url)
+                df= pd.concat([df_original, df])
+                df_bytes = df.to_csv(index=False).encode()
+                repo.update_file("History.csv", "Updated history file", df_bytes, contents.sha)
 
-        st.balloons()
-        st.toast('Photos uploaded successfully', icon='📸')
-        time.sleep(5)
-        st.session_state.upload_file_key= datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-        st.rerun()
+            st.balloons()
+            st.toast('Photos uploaded successfully', icon='📸')
+            time.sleep(5)
+            st.session_state.upload_file_key= datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+            st.rerun()
