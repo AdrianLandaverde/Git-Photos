@@ -52,8 +52,6 @@ with col_metadata:
         json_metadata["Albums"])
 
         date = st.date_input("Date of event", value=datetime.datetime.now())
-        st.write(date)
-
         message = st.text_input(
             "Message 👇",
             placeholder= "An amazing day ✨",
