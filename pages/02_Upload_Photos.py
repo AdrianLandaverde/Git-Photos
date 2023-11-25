@@ -3,12 +3,20 @@ import math
 from github import Github
 import datetime
 from stqdm import stqdm
+import pandas as pd
+import json
 
 st.set_page_config(layout="wide")
 
 st.title("Upload Photos")
+g= Github(st.secrets["github_token"])
+path= st.secrets["github_user"] + "/" + st.secrets["github_repo"]
+repo= g.get_repo(path)
+
+json_metadata = json.loads(repo.get_contents("Metadata.json").decoded_content)
 
 col_upload, col_metadata = st.columns([3,1])
+
 
 with col_upload:
     st.session_state.images = []
@@ -32,21 +40,11 @@ with col_upload:
         with col3:
             if i*3+2 < len(st.session_state.images):
                 st.image(st.session_state.images[i*3+2], caption=st.session_state.images_names[i*3+2], use_column_width = True)
-        
-
-    if st.button('Upload Files'):
-        g= Github(st.secrets["github_token"])
-        path= st.secrets["github_user"] + "/" + st.secrets["github_repo"]
-        repo= g.get_repo(path)
-        for i in stqdm(range(len(st.session_state.images)), desc="Uploading files"):
-            st.write("Uploading file "+str(i))
-            datetime= datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            repo.create_file(st.session_state.images_names[i], "Upload photo at "+datetime, st.session_state.images[i])
             
 with col_metadata:
     option = st.selectbox(
     'Album',
-    ('Couple', 'Studyng Abroad', 'Family', 'Other'))
+    json_metadata["Albums"])
 
     date = st.date_input("Date of event", value=datetime.datetime.now())
     st.write(date)
@@ -55,3 +53,18 @@ with col_metadata:
         "Message 👇",
         placeholder= "An amazing day ✨",
     )
+
+    if st.button('Upload Files'):
+        list_info= []
+        for i in stqdm(range(len(st.session_state.images)), desc="Uploading files"):
+            date_string= datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+            repo.create_file(date_string+".jpg", "Upload photo at "+date_string, st.session_state.images[i])
+            list_info.append([date, option, message, date_string+".jpg"])
+
+        df= pd.DataFrame(list_info, columns=["Date", "Album", "Message", "Photos"])
+
+        contents= repo.get_contents("History.csv")
+        df_original= pd.read_csv(contents.download_url)
+        df= pd.concat([df_original, df])
+        df_bytes = df.to_csv(index=False).encode()
+        repo.update_file("History.csv", "Updated history file", df_bytes, contents.sha)
