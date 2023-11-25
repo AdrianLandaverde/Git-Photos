@@ -49,6 +49,7 @@ with col1:
         submit_button = st.form_submit_button(label='Update Settings')
 
         if submit_button:
+            albums = sorted(albums)
             contents = repo.get_contents("Metadata.json")
             json_file= {"Albums": albums}
             json_file_bytes = json.dumps(json_file).encode()
