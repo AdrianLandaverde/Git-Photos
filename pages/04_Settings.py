@@ -49,4 +49,8 @@ with col1:
         submit_button = st.form_submit_button(label='Update Settings')
 
         if submit_button:
+            contents = repo.get_contents("Metadata.json")
+            json_file= {"Albums": albums}
+            json_file_bytes = json.dumps(json_file).encode()
+            repo.update_file("Metadata.json", "Updated metadata file", json_file_bytes, contents.sha)
             st.toast('Settings updated', icon='💾')
