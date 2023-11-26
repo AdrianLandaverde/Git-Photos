@@ -1,7 +1,7 @@
 import streamlit as st
 from github import Github
 import pandas as pd
-import json
+import math
 
 st.set_page_config(layout="wide")
 
@@ -25,6 +25,7 @@ except:
 
 current_date= dates[st.session_state.n_history]
 message= messages[st.session_state.n_history]
+df_n_history= df_category[df_category["Date"]==current_date]
 
 
 with st.container():
@@ -47,3 +48,31 @@ with st.container():
             if next:
                 st.session_state.n_history+=1
                 st.rerun()
+
+with st.container():
+    for i in range(math.ceil(len(df_n_history)/4)):
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            if i*4 < len(df_n_history):
+                photo= df_n_history.iloc[i*4]["Photos"]
+                contents = repo.get_contents(photo)
+                image= contents.download_url
+                st.image(image, use_column_width = True)
+        with col2:
+            if i*4+1 < len(df_n_history):
+                photo= df_n_history.iloc[i*4+1]["Photos"]
+                contents = repo.get_contents(photo)
+                image= contents.download_url
+                st.image(image, use_column_width = True)
+        with col3:
+            if i*4+2 < len(df_n_history):
+                photo= df_n_history.iloc[i*4+2]["Photos"]
+                contents = repo.get_contents(photo)
+                image= contents.download_url
+                st.image(image, use_column_width = True)
+        with col4:
+            if i*4+3 < len(df_n_history):
+                photo= df_n_history.iloc[i*4+3]["Photos"]
+                contents = repo.get_contents(photo)
+                image= contents.download_url
+                st.image(image, use_column_width = True)
