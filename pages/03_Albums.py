@@ -2,6 +2,7 @@ import streamlit as st
 from github import Github
 import pandas as pd
 import math
+from styles import get_text_aligned
 
 st.set_page_config(layout="wide")
 
@@ -27,7 +28,6 @@ current_date= dates[st.session_state.n_history]
 message= messages[st.session_state.n_history]
 df_n_history= df_category[df_category["Date"]==current_date]
 
-
 with st.container():
     col1, col2, col3= st.columns([1, 6, 1])
     with col1:
@@ -39,6 +39,7 @@ with st.container():
                 st.rerun()
             
     with col2:
+        get_text_aligned("center", "Album: " + message, "h1")
         st.markdown(f"<h1 style='text-align: center;'>---{message}---</h1>",  unsafe_allow_html=True)
         st.markdown(f"<h4 style='text-align: center;'>---{current_date}---</h4>",  unsafe_allow_html=True)
     with col3:

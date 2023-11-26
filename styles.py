@@ -1,3 +1,5 @@
+import streamlit as st
+
 def get_container_with_border():
     return """
     {
@@ -7,7 +9,8 @@ def get_container_with_border():
     }
     """
 
-def get_text_aligned(align, text, type):
-    return f"<{type} style='text-align: {align};'>{text}</{type}>"
+def write_text_aligned(align, text, type):
+    #return f"<{type} style='text-align: {align};'>{text}</{type}>"
+    return st.markdown(f"<{type} style='text-align: {align};'>{text}</{type}>",  unsafe_allow_html=True)
 
 
