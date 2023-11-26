@@ -3,15 +3,12 @@ from github import Github
 import pandas as pd
 import math
 from styles import write_text_aligned
+from utils import write_image_of_story, get_github_repo, get_history_df 
 
 st.set_page_config(layout="wide")
 
-g= Github(st.secrets["github_token"])
-path= st.secrets["github_user"] + "/" + st.secrets["github_repo"]
-repo= g.get_repo(path)
-
-contents = repo.get_contents("History.csv")
-df = pd.read_csv(contents.download_url)
+repo= get_github_repo()
+df = get_history_df(repo)
 
 categories = df["Album"].unique()
 df_category= df[df["Album"] == categories[0]]
@@ -54,25 +51,13 @@ with st.container():
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             if i*4 < len(df_n_history):
-                photo= df_n_history.iloc[i*4]["Photos"]
-                contents = repo.get_contents(photo)
-                image= contents.download_url
-                st.image(image, use_column_width = True)
+                write_image_of_story(df_n_history.iloc[i*4]["Photos"], repo)
         with col2:
             if i*4+1 < len(df_n_history):
-                photo= df_n_history.iloc[i*4+1]["Photos"]
-                contents = repo.get_contents(photo)
-                image= contents.download_url
-                st.image(image, use_column_width = True)
+                write_image_of_story(df_n_history.iloc[i*4+1]["Photos"], repo)
         with col3:
             if i*4+2 < len(df_n_history):
-                photo= df_n_history.iloc[i*4+2]["Photos"]
-                contents = repo.get_contents(photo)
-                image= contents.download_url
-                st.image(image, use_column_width = True)
+                write_image_of_story(df_n_history.iloc[i*4+2]["Photos"], repo)
         with col4:
             if i*4+3 < len(df_n_history):
-                photo= df_n_history.iloc[i*4+3]["Photos"]
-                contents = repo.get_contents(photo)
-                image= contents.download_url
-                st.image(image, use_column_width = True)
+                write_image_of_story(df_n_history.iloc[i*4+3]["Photos"], repo)
