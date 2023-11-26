@@ -4,6 +4,7 @@ import pandas as pd
 import math
 from streamlit_extras.stylable_container import stylable_container 
 from utils import get_history_df, get_albums_metrics
+from styles import get_container_with_border, get_text_aligned
 
 st.set_page_config(layout="wide")
 
@@ -20,40 +21,28 @@ col4.metric("Last day", last_date + " 📅")
 for i in range(math.ceil(len(albums)/2)):
     col1, col2 = st.columns(2)
     with col1:
-        with stylable_container(key="container_with_border", css_styles="""
-            {
-                border: 1px solid rgba(49, 51, 63, 0.9);
-                border-radius: 0.5rem;
-                padding: calc(1em - 1px)
-            }
-            """):
+        with stylable_container(key="c1", css_styles=get_container_with_border()):
             if i*3 < len(albums):
                 df_album= df[df["Album"]==albums[i*2]].reset_index(drop=True)
-                st.markdown(f"<h4 style='text-align: center;'>{albums[i*2]}</h4>",  unsafe_allow_html=True)
+                st.markdown(get_text_aligned("center",albums[i*2], "h4"),  unsafe_allow_html=True)
                 for j in range(len(df_album)):
                     coldate, colmessage=  st.columns([1,2])
                     date= df_album.iloc[j]["Date"]
                     message= df_album.iloc[j]["Message"]
                     with coldate:
-                        st.markdown(f"<p style='text-align: right;'>{date}</p>",  unsafe_allow_html=True)
+                        st.markdown(get_text_aligned("right", date, "p"),  unsafe_allow_html=True)
                     with colmessage:
-                        st.markdown(f"<p style='text-align: left;'>{message}</p>",  unsafe_allow_html=True)
+                        st.markdown(get_text_aligned("left", message, "p"),  unsafe_allow_html=True)
     with col2:
-        with stylable_container(key="container_with_border", css_styles="""
-            {
-                border: 1px solid rgba(49, 51, 63, 0.9);
-                border-radius: 0.5rem;
-                padding: calc(1em - 1px)
-            }
-            """):
+        with stylable_container(key="c2", css_styles=get_container_with_border()):
             if i*3+1 < len(albums):
                 df_album= df[df["Album"]==albums[i*2+1]].reset_index(drop=True)
-                st.markdown(f"<h4 style='text-align: center;'>{albums[i*2+1]}</h4>",  unsafe_allow_html=True)
+                st.markdown(get_text_aligned("center",albums[i*2+1], "h4"),  unsafe_allow_html=True)
                 for j in range(len(df_album)):
                     coldate, colmessage= st.columns([1,2])
                     date= df_album.iloc[j]["Date"]
                     message= df_album.iloc[j]["Message"]
                     with coldate:
-                        st.markdown(f"<p style='text-align: right;'>{date}</p>",  unsafe_allow_html=True)
+                        st.markdown(get_text_aligned("right", date, "p"),  unsafe_allow_html=True)
                     with colmessage:
-                        st.markdown(f"<p style='text-align: left;'>{message}</p>",  unsafe_allow_html=True)
+                        st.markdown(get_text_aligned("left", message, "p"),  unsafe_allow_html=True)
