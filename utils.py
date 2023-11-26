@@ -26,3 +26,14 @@ def get_albums_metrics(df):
     last_date= dates_total[-1]
     last_date= last_date.strftime("%Y-%m-%d")
     return albums, n_photos, last_date, df
+
+def create_file(repo, name, message, content):
+    repo.create_file(name, message, content)
+
+def update_history_file(repo, df):
+    contents= repo.get_contents("History.csv")
+    df_original= pd.read_csv(contents.download_url)
+    df= pd.concat([df_original, df])
+    df_bytes = df.to_csv(index=False).encode()
+    repo.update_file("History.csv", "Updated history file", df_bytes, contents.sha)
+    

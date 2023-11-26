@@ -6,23 +6,20 @@ from stqdm import stqdm
 import pandas as pd
 import json
 import time
+from utils import get_github_repo, create_file, update_history_file
 
 st.set_page_config(layout="wide")
 
 st.title("Upload Photos")
-g= Github(st.secrets["github_token"])
-path= st.secrets["github_user"] + "/" + st.secrets["github_repo"]
-repo= g.get_repo(path)
 
+repo= get_github_repo()
 json_metadata = json.loads(repo.get_contents("Metadata.json").decoded_content)
-
-col_upload, col_metadata = st.columns([3,1])
 try:
     temp= st.session_state.upload_file_key
 except:
     st.session_state.upload_file_key= datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
 
-
+col_upload, col_metadata = st.columns([3,1])
 with col_upload:
     st.session_state.images = []
     st.session_state.images_names= []
@@ -62,16 +59,12 @@ with col_metadata:
             list_info= []
             for i in stqdm(range(len(st.session_state.images)), desc="Uploading files"):
                 date_string= datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-                repo.create_file(date_string+".jpg", "Upload photo at "+date_string, st.session_state.images[i])
+                create_file(repo, date_string+".jpg", "Upload photo", st.session_state.images[i])
                 list_info.append([date, option, message, date_string+".jpg"])
 
             with st.spinner('Loading final files into Github...'):
                 df= pd.DataFrame(list_info, columns=["Date", "Album", "Message", "Photos"])
-                contents= repo.get_contents("History.csv")
-                df_original= pd.read_csv(contents.download_url)
-                df= pd.concat([df_original, df])
-                df_bytes = df.to_csv(index=False).encode()
-                repo.update_file("History.csv", "Updated history file", df_bytes, contents.sha)
+                update_history_file(repo, df)
 
             st.balloons()
             st.toast('Photos uploaded successfully', icon='📸')
