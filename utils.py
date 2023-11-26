@@ -1,6 +1,7 @@
 from github import Github
 import streamlit as st
 import pandas as pd
+import json
 
 def get_github_repo():
     g= Github(st.secrets["github_token"])
@@ -42,4 +43,21 @@ def write_image_of_story(photo, repo):
     contents = repo.get_contents(photo)
     image= contents.download_url
     return st.image(image, use_column_width = True)
+
+def check_or_create_config_files(repo):
+    try:
+        contents = repo.get_contents("History.csv")
+    except:
+        df= pd.DataFrame(columns=["Date", "Album", "Message", "Photos"])
+        df_bytes = df.to_csv(index=False).encode()
+        repo.create_file("History.csv", "Created history file", df_bytes)
+        st.toast('History file created', icon='📸')
+
+    try:
+        contents = repo.get_contents("Metadata.json")
+    except:
+        json_file= {"Albums": ['Other']}
+        json_file_bytes = json.dumps(json_file).encode()
+        repo.create_file("Metadata.json", "Created metadata file", json_file_bytes)
+        st.toast('Metadata file created', icon='📸')
     

@@ -3,6 +3,7 @@ from github import Github
 import pandas as pd
 import json
 from streamlit_tags import st_tags
+from utils import get_github_repo, check_or_create_config_files
 
 st.set_page_config(layout="wide")
 
@@ -12,21 +13,7 @@ g= Github(st.secrets["github_token"])
 path= st.secrets["github_user"] + "/" + st.secrets["github_repo"]
 repo= g.get_repo(path)
 
-try:
-    contents = repo.get_contents("History.csv")
-except:
-    df= pd.DataFrame(columns=["Date", "Album", "Message", "Photos"])
-    df_bytes = df.to_csv(index=False).encode()
-    repo.create_file("History.csv", "Created history file", df_bytes)
-    st.toast('History file created', icon='📸')
-
-try:
-    contents = repo.get_contents("Metadata.json")
-except:
-    json_file= {"Albums": ['Other']}
-    json_file_bytes = json.dumps(json_file).encode()
-    repo.create_file("Metadata.json", "Created metadata file", json_file_bytes)
-    st.toast('Metadata file created', icon='📸')
+check_or_create_config_files(repo)
 
 json_metadata = json.loads(repo.get_contents("Metadata.json").decoded_content)
 albums_metadata = json_metadata["Albums"]
